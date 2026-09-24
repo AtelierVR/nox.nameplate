@@ -1,0 +1,24 @@
+{
+    "name": "Nox.Nameplate.Runtime",
+    "rootNamespace": "",
+    "references": [
+        "UniTask",
+        "Nox.Nameplate",
+        "Nox.CCK",
+        "Nox.Entities",
+        "Nox.Players",
+        "Nox.Sessions",
+        "Nox.Users",
+        "Nox.CCK.Network",
+        "Unity.TextMeshPro"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

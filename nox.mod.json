@@ -1,0 +1,66 @@
+{
+  "type": "mod",
+  "id": "nox.nameplate",
+  "provides": [
+    "nameplate"
+  ],
+  "name": "Nameplate",
+  "version": "1.0.0",
+  "description": "Displays a nameplate above remote players' heads (identity, presence, badges and heartbar).",
+  "license": "GPL-3.0",
+  "icon": null,
+  "contact": {
+    "email": "hactazia@gmail.com",
+    "source": "https://github.com/AtelierVR/nox.nameplate",
+    "website": "https://nox.hactazia.fr/",
+    "issues": "https://github.com/AtelierVR/nox.nameplate/issues"
+  },
+  "authors": [
+    {
+      "name": "Hactazia",
+      "email": "hactazia@gmail.com",
+      "website": "https://hactazia.fr/"
+    }
+  ],
+  "relations": [
+    {
+      "id": "players",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.players.git"
+    },
+    {
+      "id": "session",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.sessions.git"
+    },
+    {
+      "id": "users",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.users.git"
+    },
+    {
+      "id": "network",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.network.git"
+    }
+  ],
+  "constraints": [
+    {
+      "type": "after",
+      "id": "session"
+    },
+    {
+      "type": "after",
+      "id": "players"
+    },
+    {
+      "type": "after",
+      "id": "users"
+    }
+  ],
+  "entrypoints": {
+    "main": [
+      "Nox.Nameplate.Runtime.Main"
+    ]
+  }
+}
