@@ -4,7 +4,6 @@
     "references": [
         "UniTask",
         "Nox.CCK",
-        "Nox.Players",
         "Nox.Users"
     ],
     "includePlatforms": [],
