@@ -21,6 +21,7 @@ namespace Nox.Nameplate.Runtime {
 		public TextLanguage Slug;
 		public Image Thumbnail;
 		public Image PresenceDot;
+		public Image Voice;
 		public IconRow Status;
 		public IconRow Badges;
 		public GameObject HeartContainer;
@@ -38,6 +39,12 @@ namespace Nox.Nameplate.Runtime {
 		private float _heartValue;
 		private float _heartMax = 100f;
 		private string _display;
+
+		/// <summary>Colour of the display name and of the voice image (null = white).</summary>
+		private Color? _color;
+
+		/// <summary>Voice level (0-1), used as the alpha of the voice image.</summary>
+		private float _voice;
 
 		[SerializeField]
 		[Tooltip("Only apply the camera yaw to the plate (keeps the plate horizontal).")]
@@ -70,6 +77,8 @@ namespace Nox.Nameplate.Runtime {
 			if (Head != null)
 				Head.SetActive(false);
 
+			// No voice level pushed yet: the voice image starts hidden (alpha 0).
+			RefreshVoice();
 			RefreshHeart();
 			RefreshVisibility();
 		}
@@ -99,6 +108,17 @@ namespace Nox.Nameplate.Runtime {
 
 				case Keys.BADGES when value is Dictionary<string, string> v1: 
 					Badges.Set(v1); 
+					break;
+
+				case Keys.VOICE:
+					_voice = Mathf.Clamp01(value.ToFloat());
+					RefreshVoice();
+					break;
+
+				case Keys.COLOR:
+					_color = ParseColor(value);
+					RefreshVoice();
+					RefreshDisplay();
 					break;
 
 				case Keys.HEARTS_VISIBLE: 
@@ -131,6 +151,8 @@ namespace Nox.Nameplate.Runtime {
 				Keys.DISPLAY		=> _display,
 				Keys.STATUS		 => Status.Values,
 				Keys.BADGES		 => Badges.Values,
+				Keys.VOICE          => _voice,
+				Keys.COLOR          => _color,
 				Keys.HEARTS_VISIBLE => _heartVisible,
 				Keys.HEARTS_VALUE   => _heartValue,
 				Keys.HEARTS_MAX	 => _heartMax,
@@ -170,7 +192,7 @@ namespace Nox.Nameplate.Runtime {
 			var presence = user?.Presence;
 			if (PresenceDot != null) {
 				PresenceDot.gameObject.SetActive(presence != null);
-				if (presence != null) PresenceDot.color = StatusColor(presence.Status);
+				if (presence != null) PresenceDot.color = presence.Status.ToColor();
 			}
 
 			RefreshBody();
@@ -189,16 +211,6 @@ namespace Nox.Nameplate.Runtime {
 			net.Url = url;
 		}
 
-		private static Color StatusColor(UserStatus status) => status switch {
-			UserStatus.OFFLINE			 => new Color(0.55f, 0.55f, 0.55f),
-			UserStatus.BUSY				=> new Color(0.95f, 0.35f, 0.30f),
-			UserStatus.DO_NOT_DISTURB	  => new Color(0.90f, 0.25f, 0.25f),
-			UserStatus.STREAM			  => new Color(0.70f, 0.35f, 0.95f),
-			UserStatus.EVENTS			  => new Color(1.00f, 0.75f, 0.25f),
-			UserStatus.PUBLIC or UserStatus.ONLINE_JOIN => new Color(0.35f, 0.90f, 0.45f),
-			_							  => new Color(0.35f, 0.80f, 0.45f),
-		};
-
 		private void RefreshHeart() {
 			if (HeartContainer != null) HeartContainer.SetActive(_heartVisible);
 			if (HeartSlider != null) HeartSlider.value = Mathf.Clamp01(Mathf.Clamp(_heartValue, 0f, _heartMax) / _heartMax);
@@ -215,9 +227,50 @@ namespace Nox.Nameplate.Runtime {
 			if (Head != null) Head.SetActive(HasIdentity);
 		}
 
-		/// <summary>Display text: the custom display name when set, else the profile's own one.</summary>
+		/// <summary>
+		/// Display text: the custom display name when set, else the profile's own one, wrapped in a
+		/// RichText colour tag when a colour is set (<see cref="Keys.COLOR"/>).
+		/// </summary>
 		private void RefreshDisplay()
-			=> SetLanguage(Display, LangDisplay, _display ?? User?.Display ?? string.Empty);
+			=> SetLanguage(Display, LangDisplay, Colorize(_display ?? User?.Display ?? string.Empty));
+
+		/// <summary>
+		/// Applies the colour (<see cref="Keys.COLOR"/>, white by default) and the voice level
+		/// (<see cref="Keys.VOICE"/>, used as alpha) to the voice image.
+		/// </summary>
+		private void RefreshVoice() {
+			if (Voice == null) return;
+
+			var color = _color ?? Color.white;
+			color.a = _voice;
+			Voice.color = color;
+		}
+
+		/// <summary>
+		/// Wraps the text in a RichText <c>&lt;color&gt;</c> tag when a colour is set
+		/// (<see cref="Keys.COLOR"/>), so the display component keeps its own material and font.
+		/// </summary>
+		private string Colorize(string text)
+			=> _color is { } color && !string.IsNullOrEmpty(text)
+				? $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>{text}</color>"
+				: text;
+
+		/// <summary>
+		/// Reads a colour pushed through <see cref="Keys.COLOR"/>: a <c>UnityEngine.Color</c> or an
+		/// HTML string (<c>#RRGGBB</c>, <c>#RRGGBBAA</c>). Anything else (including <c>null</c>)
+		/// clears it back to the default (white).
+		/// </summary>
+		private static Color? ParseColor(object value)
+			=> value switch {
+				Color color => color,
+				string html => ParseHtmlColor(html),
+				_           => null
+			};
+
+		private static Color? ParseHtmlColor(string html)
+			=> !string.IsNullOrEmpty(html) && ColorUtility.TryParseHtmlString(html, out var parsed)
+				? parsed
+				: (Color?)null;
 
 		private void RefreshBody() {
 			if (Body != null) Body.SetActive(HasIdentity || _heartVisible);

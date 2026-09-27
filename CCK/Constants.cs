@@ -35,6 +35,15 @@ namespace Nox.CCK.Nameplate {
 		/// An empty list hides the row.</summary>
 		public const string BADGES = "badges";
 
+		/// <summary><see cref="float"/> — voice level in the <c>0-1</c> range (0 hides the image).
+		/// Drives the alpha of the plate's voice image (<c>voice</c>).</summary>
+		public const string VOICE = "voice";
+
+		/// <summary><c>UnityEngine.Color</c> (or an HTML string: <c>#RRGGBB</c>, <c>#RRGGBBAA</c>)
+		/// — colour of the display name and of the voice image. Anything else (including
+		/// <c>null</c>) clears it back to the default (white).</summary>
+		public const string COLOR = "color";
+
 		/// <summary><see cref="bool"/> — show or hide the heartbar.</summary>
 		public const string HEARTS_VISIBLE = "hearts.visible";
 

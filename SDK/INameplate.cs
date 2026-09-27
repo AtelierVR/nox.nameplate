@@ -30,6 +30,7 @@ namespace Nox.Nameplate {
 		/// Set a value of the plate. Use the keys of <c>Nox.CCK.Nameplate.Constants</c>:
 		/// <c>User</c>, <c>Visible</c> (always local: it drives every nameplate of this client),
 		/// <c>HeightOffset</c>, <c>Status</c> and <c>Badges</c> (value arrays rendered as icons),
+		/// <c>Voice</c> (0-1 level) and <c>Color</c> (colour of the name and of the voice image),
 		/// <c>Hearts_Visible</c>, <c>Hearts_Value</c>, <c>Hearts_Max</c>.
 		/// </summary>
 		void Set<T>(string key, T value);
