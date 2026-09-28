@@ -32,6 +32,11 @@
       "id": "network",
       "type": "depends",
       "register": "git+https://github.com/AtelierVR/nox.network.git"
+    },
+    {
+      "id": "scripting",
+      "type": "depends",
+      "register": "git+https://github.com/AtelierVR/nox.scripting.git"
     }
   ],
   "constraints": [],

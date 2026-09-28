@@ -6,8 +6,11 @@
         "Nox.Nameplate",
         "Nox.CCK.Nameplate",
         "Nox.CCK",
+        "Nox.Entities",
         "Nox.Users",
         "Nox.CCK.Network",
+        "Nox.Scripting",
+        "Nox.CCK.Scripting",
         "Unity.TextMeshPro"
     ],
     "includePlatforms": [],

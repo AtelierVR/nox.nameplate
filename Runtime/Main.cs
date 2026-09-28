@@ -5,6 +5,8 @@ using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
 using Nox.CCK.Mods.Initializers;
 using Nox.CCK.Utils;
+using Nox.Nameplate.Runtime.Converters;
+using Nox.Scripting;
 using UnityEngine;
 using Logger = Nox.CCK.Utils.Logger;
 
@@ -30,6 +32,11 @@ namespace Nox.Nameplate.Runtime {
 
 		internal static IMainModCoreAPI CoreAPI { get; private set; }
 
+		internal static IScriptingAPI ScriptingAPI
+			=> CoreAPI?.ModAPI
+				?.GetMod("scripting")
+				?.GetInstance<IScriptingAPI>();
+
 		/// <summary>Plates, keyed by anchor instance id.</summary>
 		private readonly Dictionary<int, Plate> _plates = new();
 
@@ -37,9 +44,9 @@ namespace Nox.Nameplate.Runtime {
 		private LanguagePack _lang;
 
 		/// <summary>
-		/// Visibility of the nameplates, always <b>local</b> (client-wide). The value itself belongs to
-		/// the plates (<c>Plate.Visible</c>, a local value per plate) — it is read back from them so the
-		/// plates created later start with the current one.
+		/// Visibility of the nameplates, always <b>local</b>. The value belongs to each plate
+		/// (<c>Plate.Visible</c>): the local client's plate is driven by the controller (its menu
+		/// provider), the remote players' plates by the scripts.
 		/// </summary>
 		internal bool Visible
 			=> _plates.Values.FirstOrDefault(plate => plate != null)?.Visible ?? true;
@@ -58,9 +65,13 @@ namespace Nox.Nameplate.Runtime {
 
 			_lang = api.AssetAPI.GetAsset<LanguagePack>("lang.asset");
 			LanguageManager.AddPack(_lang);
+
+			ScriptingAPI?.RegisterConverter(NameplateConverter.Entity);
 		}
 
 		public void OnDisposeMain() {
+			ScriptingAPI?.UnregisterConverter(NameplateConverter.Entity);
+
 			LanguageManager.RemovePack(_lang);
 			_lang = null;
 
