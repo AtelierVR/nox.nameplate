@@ -72,6 +72,9 @@ namespace Nox.Nameplate.Runtime {
 		internal void Bind(Main main, Transform anchor) {
 			_main   = main;
 			_anchor = anchor;
+
+			// Each plate carries its own visibility, pushed by its owner: the controller (its menu
+			// provider) for the local client's plate, the scripts for the remote players' plates.
 			_visible = true;
 
 			if (Head != null)
@@ -87,7 +90,9 @@ namespace Nox.Nameplate.Runtime {
 		public void Set<T>(string key, T value) {
 			switch (key) {
 				case Keys.VISIBLE: 
-					Visible = value.ToBool(); 
+					// Per plate: the local client's plate is driven by the controller (menu), the remote
+					// players' plates by the scripts.
+					Visible = value.ToBool();
 					break;
 				
 				case Keys.HEIGHT_OFFSET: 
@@ -270,7 +275,7 @@ namespace Nox.Nameplate.Runtime {
 		private static Color? ParseHtmlColor(string html)
 			=> !string.IsNullOrEmpty(html) && ColorUtility.TryParseHtmlString(html, out var parsed)
 				? parsed
-				: (Color?)null;
+				: null;
 
 		private void RefreshBody() {
 			if (Body != null) Body.SetActive(HasIdentity || _heartVisible);
@@ -280,7 +285,7 @@ namespace Nox.Nameplate.Runtime {
 
 		internal void RefreshVisibility() {
 			if (_destroyed) return;
-			var show = _visible && _anchor != null && _anchor.gameObject.activeInHierarchy;
+			var show = _visible && _anchor != null;
 			if (gameObject.activeSelf != show) {
 				gameObject.SetActive(show);
 				if (show) RefreshLayout();

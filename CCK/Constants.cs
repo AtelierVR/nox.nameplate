@@ -3,10 +3,9 @@ namespace Nox.CCK.Nameplate {
 	/// Well-known keys accepted by <c>INameplate.Set/Get</c>.
 	/// </summary>
 	public static class Constants {
-		/// <summary><see cref="bool"/> — visibility, always <b>local</b> (client-wide):
-		/// there is no per-plate visibility, a plate that receives it is the client's handle on the
-		/// nameplate system and drives every nameplate of this client (the plate itself displays
-		/// nothing).</summary>
+		/// <summary><see cref="bool"/> — visibility of <b>this</b> plate, always <b>local</b>.
+		/// The plate of the local client is driven by the controller (its menu provider), the plates of
+		/// the remote players by the scripts.</summary>
 		public const string VISIBLE = "visible";
 
 		/// <summary><see cref="float"/> — vertical offset (metres) applied above the anchor.</summary>
