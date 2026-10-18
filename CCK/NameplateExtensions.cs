@@ -17,6 +17,9 @@ namespace Nox.CCK.Nameplate {
 		/// <summary>Icon folder of the engine sprites (<c>ui:engines/&lt;name&gt;.png</c>).</summary>
 		public const string EnginesFolder = "engines";
 
+		/// <summary>Icon folder of the status sprites (<c>ui:icons/status/&lt;name&gt;.png</c>).</summary>
+		public const string StatusFolder = "status";
+
 		/// <summary>
 		/// True when the plate is still usable.
 		/// <para>
@@ -64,6 +67,10 @@ namespace Nox.CCK.Nameplate {
 		/// <summary>Sprite of an engine icon: <c>ui:engines/&lt;name&gt;.png</c>.</summary>
 		public static ResourceIdentifier EngineIcon(string name)
 			=> new(IconsNamespace, $"icons/{EnginesFolder}/{name}.png");
+
+		/// <summary>Sprite of a status icon: <c>ui:icons/status/&lt;name&gt;.png</c>.</summary>
+		public static ResourceIdentifier StatusIcon(string name)
+			=> new(IconsNamespace, $"icons/{StatusFolder}/{name}.png");
 
 		/// <summary>False for an empty or "none" value (platform/engine never announced).</summary>
 		private static bool IsKnown(string name)

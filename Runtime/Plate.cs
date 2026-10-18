@@ -87,6 +87,12 @@ namespace Nox.Nameplate.Runtime {
 		}
 
 		// ── Values & Language ─────────────────────────────────────────────────
+
+		/// <summary>
+		/// Applies a value pushed by the plate's owner. The owners push every frame (voice level,
+		/// status row), so a value identical to the cached one returns immediately: each change
+		/// re-lays the plate out or reloads an icon, which is not free.
+		/// </summary>
 		public void Set<T>(string key, T value) {
 			switch (key) {
 				case Keys.VISIBLE: 
@@ -95,19 +101,31 @@ namespace Nox.Nameplate.Runtime {
 					Visible = value.ToBool();
 					break;
 				
-				case Keys.HEIGHT_OFFSET: 
-					_heightOffset = value.ToFloat(); 
-					break;
+				case Keys.HEIGHT_OFFSET: {
+					var height = value.ToFloat();
+					if (Mathf.Approximately(_heightOffset, height))
+						return;
 
-				case Keys.USER: 
-					SetUser(value is IUser user ? user : null); 
+					_heightOffset = height;
 					break;
+				}
+
+				case Keys.USER: {
+					// Same profile instance: nothing to rebuild (the identifiers are the identity).
+					var user = value as IUser;
+					if (ReferenceEquals(User, user))
+						return;
+
+					SetUser(user);
+					break;
+				}
 
 				case Keys.DISPLAY: 
 					SetDisplay(value as string); 
 					break;
 					
 				case Keys.STATUS when value is Dictionary<string, string> v0: 
+					// The row compares its own values and skips an identical rebuild.
 					Status.Set(v0); 
 					break;
 
@@ -115,32 +133,58 @@ namespace Nox.Nameplate.Runtime {
 					Badges.Set(v1); 
 					break;
 
-				case Keys.VOICE:
-					_voice = Mathf.Clamp01(value.ToFloat());
+				case Keys.VOICE: {
+					var voice = Mathf.Clamp01(value.ToFloat());
+					if (Mathf.Approximately(_voice, voice))
+						return;
+
+					_voice = voice;
 					RefreshVoice();
 					break;
+				}
 
-				case Keys.COLOR:
-					_color = ParseColor(value);
+				case Keys.COLOR: {
+					var color = ParseColor(value);
+					if (_color == color)
+						return;
+
+					_color = color;
 					RefreshVoice();
 					RefreshDisplay();
 					break;
+				}
 
-				case Keys.HEARTS_VISIBLE: 
-					_heartVisible = value.ToBool(); RefreshHeart(); 
-					break;
+				case Keys.HEARTS_VISIBLE: {
+					var visible = value.ToBool();
+					if (_heartVisible == visible)
+						return;
 
-				case Keys.HEARTS_VALUE: 
-					_heartValue = value.ToFloat(); 
-					_heartVisible = true; 
-					RefreshHeart(); 
+					_heartVisible = visible;
+					RefreshHeart();
 					break;
+				}
 
-				case Keys.HEARTS_MAX: 
-					_heartMax = Mathf.Max(value.ToFloat(), 0.0001f); 
-					_heartVisible = true; 
-					RefreshHeart(); 
+				case Keys.HEARTS_VALUE: {
+					var heart = value.ToFloat();
+					if (_heartVisible && Mathf.Approximately(_heartValue, heart))
+						return;
+
+					_heartValue = heart;
+					_heartVisible = true;
+					RefreshHeart();
 					break;
+				}
+
+				case Keys.HEARTS_MAX: {
+					var max = Mathf.Max(value.ToFloat(), 0.0001f);
+					if (_heartVisible && Mathf.Approximately(_heartMax, max))
+						return;
+
+					_heartMax = max;
+					_heartVisible = true;
+					RefreshHeart();
+					break;
+				}
 
 				default: 
 					Logger.LogWarning($"Unknown nameplate key '{key}'.", tag: Tag); 
@@ -179,7 +223,13 @@ namespace Nox.Nameplate.Runtime {
 		/// profile's own <c>Display</c> (<c>Keys.DISPLAY</c>).
 		/// </summary>
 		private void SetDisplay(string display) {
-			_display = string.IsNullOrEmpty(display) ? null : display;
+			display = string.IsNullOrEmpty(display) 
+				? null 
+				: display;
+			if (_display == display)
+				return;
+
+			_display = display;
 			RefreshHead();
 			RefreshDisplay();
 			RefreshLayout();
