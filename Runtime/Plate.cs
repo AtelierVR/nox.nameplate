@@ -384,19 +384,15 @@ namespace Nox.Nameplate.Runtime {
 		}
 
 		private void FaceCamera(Camera cam) {
-			Vector3 forward = cam.transform.forward;
-
-			if (_yawOnly) {
-				forward.y = 0f;
-				if (forward.sqrMagnitude < 0.0001f) return;
-				forward.Normalize();
-			}
-
-			if (_reverseFacing) {
-				forward = -forward;
-			}
-
-			transform.rotation = Quaternion.LookRotation(forward, Vector3.up);
+			if (CameraHelper.TryGetFacing(
+				transform.position,
+				cam,
+				out var rotation,
+				CameraFacingMode.Forward,
+				_yawOnly,
+				_reverseFacing
+			))
+				transform.rotation = rotation;
 		}
 
 		// ── Lifetime ──────────────────────────────────────────────────────────
