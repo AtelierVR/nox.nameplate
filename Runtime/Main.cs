@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using Nox.CCK.Language;
 using Nox.CCK.Mods.Cores;
@@ -85,7 +86,7 @@ namespace Nox.Nameplate.Runtime {
 
 		// ── INameplateAPI ─────────────────────────────────────────────────────
 
-		public async UniTask<INameplate> Instantiate(Transform anchor) {
+		public async UniTask<INameplate> Instantiate(Transform anchor, CancellationToken cancellationToken = default) {
 			if (anchor == null)
 				return null;
 
@@ -93,7 +94,7 @@ namespace Nox.Nameplate.Runtime {
 			if (_plates.TryGetValue(key, out var existing) && existing != null)
 				return existing;
 
-			var prefab = await CoreAPI.AssetAPI.GetAssetAsync<GameObject>("plate.prefab");
+			var prefab = await CoreAPI.AssetAPI.GetAssetAsync<GameObject>("plate.prefab", cancellationToken);
 			if (prefab == null) {
 				Logger.LogError("Plate prefab is missing, cannot create a nameplate.", tag: Tag);
 				return null;
@@ -102,9 +103,9 @@ namespace Nox.Nameplate.Runtime {
 			if (_plates.TryGetValue(anchor.GetId(), out existing) && existing != null)
 				return existing;
 
-			var plate = await prefab.InstantiateAsync<Plate>(anchor);
+			var plate = await prefab.InstantiateAsync<Plate>(anchor, cancellationToken: cancellationToken);
 			var go = plate as MonoBehaviour;
-			go.gameObject.name = $"{nameof(Plate)}_{anchor.name}";
+			go.gameObject.name = $"[{nameof(Plate)}] {anchor.GetId()}";
 
 			plate.Bind(this, anchor);
 			_plates[anchor.GetId()] = plate;

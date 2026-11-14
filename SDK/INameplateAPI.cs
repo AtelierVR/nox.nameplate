@@ -1,3 +1,4 @@
+using System.Threading;
 using Cysharp.Threading.Tasks;
 using UnityEngine;
 
@@ -19,6 +20,7 @@ namespace Nox.Nameplate {
 		/// and is disposed when no longer needed.
 		/// </summary>
 		/// <param name="anchor">Dedicated anchor transform owned by the caller.</param>
-		UniTask<INameplate> Instantiate(Transform anchor);
+		/// <param name="cancellationToken">Owns the creation: cancelling it drops the instantiation.</param>
+		UniTask<INameplate> Instantiate(Transform anchor, CancellationToken cancellationToken = default);
 	}
 }
