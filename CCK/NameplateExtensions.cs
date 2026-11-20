@@ -20,6 +20,9 @@ namespace Nox.CCK.Nameplate {
 		/// <summary>Icon folder of the status sprites (<c>ui:icons/status/&lt;name&gt;.png</c>).</summary>
 		public const string StatusFolder = "status";
 
+		/// <summary>Icon folder of the voice-mode sprites (<c>ui:icons/audio/&lt;name&gt;.png</c>).</summary>
+		public const string VoiceFolder = "audio";
+
 		/// <summary>
 		/// True when the plate is still usable.
 		/// <para>
@@ -71,6 +74,13 @@ namespace Nox.CCK.Nameplate {
 		/// <summary>Sprite of a status icon: <c>ui:icons/status/&lt;name&gt;.png</c>.</summary>
 		public static ResourceIdentifier StatusIcon(string name)
 			=> new(IconsNamespace, $"icons/{StatusFolder}/{name}.png");
+
+		/// <summary>
+		/// Sprite of a voice-mode icon: <c>ui:icons/audio/&lt;name&gt;.png</c> (the sprites of the voice HUD:
+		/// <c>mute</c>, <c>whisper</c>, <c>loud</c>, <c>broadcast</c>).
+		/// </summary>
+		public static ResourceIdentifier VoiceIcon(string name)
+			=> new(IconsNamespace, $"icons/{VoiceFolder}/{name}.png");
 
 		/// <summary>False for an empty or "none" value (platform/engine never announced).</summary>
 		private static bool IsKnown(string name)
